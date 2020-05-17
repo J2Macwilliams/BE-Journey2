@@ -3,7 +3,7 @@ version: '2.4'
 services:
   # The Apollo service
   apollo:
-    image: lambdaschoollabs/beerthoven-apollo:latest
+    image: j2acwilliams/journey2-apollo:latest
     build:
       context: ./apollo
       dockerfile: Dockerfile
@@ -43,22 +43,20 @@ services:
         managementApiSecret: ${PRISMA_MANAGEMENT_API_SECRET:?You must specify PRISMA_MANAGEMENT_API_SECRET}
         databases:
           default:
-            connector: postgres
-            host: postgres
-            port: 5432
-            user: ${POSTGRES_USER:-prisma}
-            password: ${POSTGRES_PASSWORD:-prisma}
-
-  # The Postgres service
-  postgres:
-    image: postgres:10.3
-    cpus: '0.25'
-    mem_limit: 250M
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-prisma}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prisma}
+            connector: mongo
+            uri: ${MONGO_DB_CONNECTION}
+            
+  # The Mongo Service
+    mongo:
+      image: mongo:3.6
+      restart: always
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      ports:
+        - '27017:27017'
+      volumes:
+        - mongo:/var/lib/mongo
     volumes:
-      - postgres:/var/lib/postgresql-prisma/data:delegated
-
-volumes:
-  postgres: ~
+    mongo: ~
+  
